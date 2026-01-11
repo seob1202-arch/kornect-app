@@ -129,7 +129,7 @@
         .modern-card-desc { font-size: 11px; color: var(--text-sub); }
 
         /* 배너 */
-        .banner-card { background: var(--primary-gradient); border-radius: var(--radius-lg); padding: 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-glow); margin-bottom: 32px; text-decoration: none; transition: transform 0.2s; }
+        .banner-card { background: var(--primary-gradient); border-radius: var(--radius-lg); padding: 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-glow); margin-bottom: 32px; text-decoration: none; transition: transform 0.2s; cursor: pointer; }
         .banner-title { font-size: 18px; font-weight: 800; color: white; display: block; margin-bottom: 4px;}
         .banner-desc { font-size: 13px; color: rgba(255,255,255,0.9); display: block;}
         .banner-icon { font-size: 32px; background: rgba(255,255,255,0.2); padding: 12px; border-radius: 50%; color: white; }
@@ -204,7 +204,6 @@
         #introPage .intro-card p { font-size: 14px; color: #475569; line-height: 1.5; }
         #introPage .problem-section { padding: 60px 0; }
         
-        /* [완벽한 중앙 정렬 수정] */
         #introPage .text-center-wrapper { 
             text-align: center; 
             margin-bottom: 40px; 
@@ -232,6 +231,24 @@
         #introPage .cta-btn-white:hover { transform: scale(1.05); }
         .fade-in-up { opacity: 0; transform: translateY(20px); transition: 0.8s ease-out; }
         .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+
+        /* [NEW] 인앱 브라우저 (In-App Browser) 스타일 */
+        #inAppBrowser {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: white; z-index: 9999;
+            display: none; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #inAppBrowser.active { transform: translateY(0); display: flex; }
+        .inapp-header {
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; border-bottom: 1px solid #e2e8f0; background: white; flex-shrink: 0;
+            padding-top: env(safe-area-inset-top);
+        }
+        .inapp-title { font-size: 16px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+        .inapp-close { font-size: 24px; color: #0f172a; cursor: pointer; padding: 8px; }
+        .inapp-frame { flex: 1; border: none; width: 100%; height: 100%; background: #f8fafc; }
+        .inapp-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6366f1; display: none; }
 
         /* =========================================
            2. DESKTOP / TABLET ADAPTIVE STYLES 
@@ -280,6 +297,19 @@
             }
             
             #introPage .intro-nav { position: fixed; max-width: 1024px; margin: 0 auto; left: 0; right: 0; }
+            
+            /* PC에서는 인앱 브라우저도 중앙 정렬 팝업으로 */
+            #inAppBrowser.active {
+                transform: translate(-50%, -50%); top: 50%; left: 50%;
+                width: 1000px; height: 85vh; border-radius: 20px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+                overflow: hidden;
+            }
+            #inAppBrowser.active::before {
+                content: ''; position: fixed; top: -50vh; left: -50vw; width: 200vw; height: 200vh;
+                background: rgba(0,0,0,0.6); z-index: -1; backdrop-filter: blur(4px);
+                pointer-events: all; cursor: pointer;
+            }
         }
     </style>
 </head>
@@ -302,13 +332,13 @@
             </header>
 
             <div class="content-container">
-                <a href="https://join-olive.vercel.app" target="_blank" class="banner-card">
+                <div onclick="openInAppBrowser('https://join-olive.vercel.app', '비즈니스 무료 등록')" class="banner-card">
                     <div class="banner-content">
                         <span class="banner-title">비즈니스 무료 등록</span>
                         <span class="banner-desc">전 세계 한인들에게 홍보하세요!</span>
                     </div>
                     <span class="material-icons-round banner-icon">storefront</span>
-                </a>
+                </div>
 
                 <div class="stats">
                     <div class="stat-card"><div class="stat-number">50+</div><div class="stat-label">도시</div></div>
@@ -319,40 +349,40 @@
                 <div class="section">
                     <div class="section-header"><div class="section-title">업체 검색하기</div></div>
                     <div class="category-grid">
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/taxi')"> 
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/taxi', '한인택시')"> 
                             <div class="cat-icon-box"><span class="material-icons-round">local_taxi</span></div> <div class="cat-name">한인택시</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/stay')"> 
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/stay', '한인숙소')"> 
                             <div class="cat-icon-box"><span class="material-icons-round">hotel</span></div> <div class="cat-name">한인숙소</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/tour')"> 
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/tour', '투어')"> 
                             <div class="cat-icon-box"><span class="material-icons-round">flag</span></div> <div class="cat-name">투어</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/restaurant')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/restaurant', '한식당')">
                             <div class="cat-icon-box"><span class="material-icons-round">restaurant</span></div> <div class="cat-name">한식당</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/mart')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/mart', '마트')">
                             <div class="cat-icon-box"><span class="material-icons-round">shopping_cart</span></div> <div class="cat-name">마트</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/beauty')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/beauty', '뷰티')">
                             <div class="cat-icon-box"><span class="material-icons-round">content_cut</span></div> <div class="cat-name">뷰티</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/legal')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/legal', '법률/세무')">
                             <div class="cat-icon-box"><span class="material-icons-round">gavel</span></div> <div class="cat-name">법률/세무</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/life')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/life', '생활')">
                             <div class="cat-icon-box"><span class="material-icons-round">build</span></div> <div class="cat-name">생활</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/education')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/education', '교육')">
                             <div class="cat-icon-box"><span class="material-icons-round">school</span></div> <div class="cat-name">교육</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/religion')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/religion', '종교')">
                             <div class="cat-icon-box"><span class="material-icons-round">church</span></div> <div class="cat-name">종교</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/club')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/club', '동호회')">
                             <div class="cat-icon-box"><span class="material-icons-round">groups</span></div> <div class="cat-name">동호회</div>
                         </div>
-                        <div class="cat-item" onclick="openCategoryURL('https://example.com/organization')">
+                        <div class="cat-item" onclick="openInAppBrowser('https://example.com/organization', '기관')">
                             <div class="cat-icon-box"><span class="material-icons-round">account_balance</span></div> <div class="cat-name">기관</div>
                         </div>
                     </div>
@@ -363,27 +393,27 @@
                         <div class="section-title">✨ 주요 서비스</div>
                     </div>
                     <div class="modern-menu-grid">
-                        <div class="modern-card" onclick="openCategoryURL('https://example.com/guide')">
+                        <div class="modern-card" onclick="openInAppBrowser('https://example.com/guide', '올인원 퀵가이드')">
                             <div class="modern-icon theme-orange"><span class="material-icons-round">auto_stories</span></div>
                             <div class="modern-card-text"><div class="modern-card-title">올인원 퀵가이드</div><div class="modern-card-desc">여행 준비 필수 정보</div></div>
                         </div>
-                        <div class="modern-card" onclick="openCategoryURL('https://used-market-omega.vercel.app')">
+                        <div class="modern-card" onclick="openInAppBrowser('https://used-market-omega.vercel.app', '중고거래 장터')">
                             <div class="modern-icon theme-indigo"><span class="material-icons-round">storefront</span></div>
                             <div class="modern-card-text"><div class="modern-card-title">중고거래 장터</div><div class="modern-card-desc">교민 간 안전한 거래</div></div>
                         </div>
-                        <div class="modern-card" onclick="openCategoryURL('https://shopping-seven-taupe.vercel.app')">
+                        <div class="modern-card" onclick="openInAppBrowser('https://shopping-seven-taupe.vercel.app', '현지 핫템 정보')">
                             <div class="modern-icon theme-pink"><span class="material-icons-round">local_fire_department</span></div>
                             <div class="modern-card-text"><div class="modern-card-title">현지 핫템 정보</div><div class="modern-card-desc">지금 뜨는 아이템은?</div></div>
                         </div>
-                        <div class="modern-card" onclick="openCategoryURL('https://freelancer-psi-five.vercel.app')">
+                        <div class="modern-card" onclick="openInAppBrowser('https://freelancer-psi-five.vercel.app', 'K-프리랜서 마켓')">
                             <div class="modern-icon theme-blue"><span class="material-icons-round">laptop_mac</span></div>
                             <div class="modern-card-text"><div class="modern-card-title">K-프리랜서 마켓</div><div class="modern-card-desc">전문가 재능 마켓</div></div>
                         </div>
-                        <div class="modern-card" onclick="openCategoryURL('https://faq-eight-eta.vercel.app')">
+                        <div class="modern-card" onclick="openInAppBrowser('https://faq-eight-eta.vercel.app', '여행정보 로드맵')">
                             <div class="modern-icon theme-teal"><span class="material-icons-round">map</span></div>
                             <div class="modern-card-text"><div class="modern-card-title">여행정보 로드맵</div><div class="modern-card-desc">자주 묻는 질문 FAQ</div></div>
                         </div>
-                        <div class="modern-card" onclick="openCategoryURL('https://k-contents.vercel.app')">
+                        <div class="modern-card" onclick="openInAppBrowser('https://k-contents.vercel.app', 'K-숏폼 큐레이션')">
                             <div class="modern-icon theme-purple"><span class="material-icons-round">play_circle</span></div>
                             <div class="modern-card-text"><div class="modern-card-title">K-숏폼 큐레이션</div><div class="modern-card-desc">화제의 영상 & 뉴스</div></div>
                         </div>
@@ -477,7 +507,7 @@
                             사장님은 <strong>본업</strong>에만 집중하세요.
                         </p>
                         <div class="fade-in-up" style="transition-delay: 0.3s">
-                            <a href="https://join-olive.vercel.app" class="btn-primary" target="_blank">무료로 등록하기</a>
+                            <button onclick="openInAppBrowser('https://join-olive.vercel.app', '비즈니스 무료 등록')" class="btn-primary" style="border:none;">무료로 등록하기</button>
                         </div>
                     </div>
                 </section>
@@ -524,13 +554,24 @@
                             <p style="color: rgba(255,255,255,0.9); font-size: 16px; margin-bottom: 24px;">
                                 복잡한 절차 없이 바로 시작하세요.
                             </p>
-                            <a href="https://join-olive.vercel.app" target="_blank" class="cta-btn-white">무료로 시작하기</a>
+                            <button onclick="openInAppBrowser('https://join-olive.vercel.app', '비즈니스 무료 등록')" class="cta-btn-white" style="border:none;">무료로 시작하기</button>
                         </div>
                         <p style="margin-top: 32px; color: #94A3B8; font-size: 12px;">
                             © 2026 Kornect. All rights reserved.
                         </p>
                     </div>
                 </section>
+            </div>
+        </div>
+
+        <div id="inAppBrowser">
+            <div class="inapp-header">
+                <span class="material-icons-round inapp-close" onclick="closeInAppBrowser()">close</span>
+                <span class="inapp-title" id="inAppTitle">페이지 제목</span>
+                <div style="width: 40px;"></div> </div>
+            <div style="position: relative; flex: 1;">
+                <div class="inapp-spinner material-icons-round" id="inAppSpinner">refresh</div>
+                <iframe class="inapp-frame" id="inAppFrame" src=""></iframe>
             </div>
         </div>
 
@@ -579,6 +620,35 @@
             setupIntroAnimations();
             await initAppOptimized();
         });
+
+        // [NEW] In-App Browser Logic
+        window.openInAppBrowser = function(url, title) {
+            const browser = document.getElementById('inAppBrowser');
+            const frame = document.getElementById('inAppFrame');
+            const titleEl = document.getElementById('inAppTitle');
+            const spinner = document.getElementById('inAppSpinner');
+            
+            titleEl.textContent = title || 'Kornect';
+            frame.src = url;
+            browser.classList.add('active');
+            
+            // 로딩 표시
+            spinner.style.display = 'block';
+            spinner.classList.add('spin'); // CSS animation needed or use inline style for simplicity
+            
+            frame.onload = function() {
+                spinner.style.display = 'none';
+            };
+        };
+
+        window.closeInAppBrowser = function() {
+            const browser = document.getElementById('inAppBrowser');
+            const frame = document.getElementById('inAppFrame');
+            browser.classList.remove('active');
+            setTimeout(() => { frame.src = ''; }, 300); // 닫히는 애니메이션 후 초기화
+            
+            // PC에서 닫을 때 오버레이 클릭 이벤트 제거 등은 CSS로 처리됨
+        };
 
         function setupIntroAnimations() {
             const introPage = document.getElementById('introPage');
@@ -724,13 +794,23 @@
                     e.target.classList.add('selected'); state.selectedCategory = e.target.dataset.value;
                 }
                 
+                // 인앱 브라우저 외부 클릭 시 닫기 (PC Only)
+                if (e.target.id === 'inAppBrowser' && window.innerWidth >= 768) {
+                    closeInAppBrowser();
+                }
+
                 if (e.target.id === 'detailPage' && window.innerWidth >= 768) {
                     handleDetailBack();
                 }
             });
         }
 
-        window.openCategoryURL = (url) => window.open(url, '_blank');
+        // 기존 openCategoryURL -> window.openCategoryURL을 유지하되, 인앱용은 별도 사용
+        window.openCategoryURL = (url) => window.openCategoryURL(url); // 기존 카테고리는 그대로 유지 (필요시 인앱으로 변경 가능)
+        
+        // 카테고리 URL도 인앱으로 열고 싶다면 아래 함수를 덮어쓰세요:
+        // window.openCategoryURL = (url) => openInAppBrowser(url, '검색 결과');
+
         window.goToMain = () => { state.cameFromMainPage = false; showPage('mainPage'); };
         window.goToSearch = () => showPage('searchPage');
         window.goToResults = () => showPage('resultsPage');
